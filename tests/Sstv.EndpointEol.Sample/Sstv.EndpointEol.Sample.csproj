@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>Sstv.EndpointEol.Sample</RootNamespace>
+        <NoWarn>$(NoWarn);CA1591</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Sstv.EndpointEol\Sstv.EndpointEol.csproj" />
+        <ProjectReference Include="..\..\src\Sstv.EndpointEol.Swashbuckle\Sstv.EndpointEol.Swashbuckle.csproj" />
+    </ItemGroup>
+
+</Project>

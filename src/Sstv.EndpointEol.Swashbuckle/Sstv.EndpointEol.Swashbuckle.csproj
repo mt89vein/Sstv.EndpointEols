@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Swashbuckle/OpenAPI annotations for Sstv.EndpointEol: deprecated flag, sunset notes and vendor extensions for endpoints marked with [EndOfLife].</Description>
+        <IsPackable>true</IsPackable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Sstv.EndpointEol\Sstv.EndpointEol.csproj" />
+    </ItemGroup>
+
+</Project>

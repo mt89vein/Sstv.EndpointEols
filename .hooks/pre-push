@@ -1,0 +1,85 @@
+#!/bin/sh
+
+# Load config (if available), fall back to defaults
+HOOK_DIR=$(dirname "$0")
+[ -f "$HOOK_DIR/config" ] && . "$HOOK_DIR/config"
+: "${TEST_FILTER:=TestCategory=UnitTests}"
+: "${FILE_PATTERNS:=\.cs$}"
+: "${SKIP_BRANCHES:=}"
+: "${ALLOW_DIRTY_PUSH:=false}"
+
+# If deleting a branch, skip all checks
+STDIN=$(cat -)
+if echo "$STDIN" | grep -q "^(delete)"; then
+  echo "(delete) found, skipping pre-push hook"
+  exit 0
+fi
+
+# Determine changed .cs files in the current branch (not yet pushed)
+if git rev-parse @{upstream} >/dev/null 2>&1; then
+    CHANGED_FILES=$(git diff --name-only @{upstream}..HEAD | grep -E "$FILE_PATTERNS" | sort -u)
+else
+    # No upstream — diff against empty tree (handles initial/single-commit branches)
+    CHANGED_FILES=$(git diff --name-only 4b825dc642cb6eb9a060e54bf899d153036ddaa7..HEAD | grep -E "$FILE_PATTERNS" | sort -u)
+fi
+
+# Skip processing on configured branches
+if [ -n "$SKIP_BRANCHES" ]; then
+    BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null)
+    if [ -n "$BRANCH_NAME" ]; then
+        for pattern in $SKIP_BRANCHES; do
+            case "$BRANCH_NAME" in
+                $pattern) echo "Skipped (branch '$BRANCH_NAME' matches '$pattern')"; exit 0 ;;
+            esac
+        done
+    fi
+fi
+
+if [ -z "$CHANGED_FILES" ]; then
+    echo "No matching files changed, skip formatting check and unit tests"
+    exit 0
+fi
+
+echo "Checking formatting of changed files..."
+CHANGED_FILES_CSV=$(echo "$CHANGED_FILES" | tr '\n' ';')
+CHANGED_FILES_CSV=${CHANGED_FILES_CSV%;}
+
+if ! dotnet format --verify-no-changes --include "$CHANGED_FILES_CSV"; then
+    echo ""
+    echo "ERROR: Some files are not formatted correctly."
+    echo "  Run 'dotnet format' locally to auto-fix, then review and commit."
+    exit 1
+fi
+echo "  Formatting check passed."
+
+echo ""
+echo "Running unit tests..."
+dotnet test --filter "$TEST_FILTER"
+test_exit=$?
+if [ $test_exit -ne 0 ]; then
+    echo ""
+    echo "ERROR: Unit tests failed (exit code: $test_exit). Fix before pushing."
+    exit 1
+fi
+echo "  All unit tests passed."
+
+# Check for uncommitted changes after tests (e.g. golden/snapshot files)
+dirty=$(git status -s)
+if [ -n "$dirty" ]; then
+    echo ""
+    if [ "$ALLOW_DIRTY_PUSH" = "true" ]; then
+        echo "WARNING: Tests generated uncommitted changes (ALLOW_DIRTY_PUSH=true):"
+        echo "$dirty"
+        echo ""
+        echo "  Pushing anyway. Review these changes after push."
+    else
+        echo "ERROR: Tests generated uncommitted changes:"
+        echo "$dirty"
+        echo ""
+        echo "  Review and commit these changes, or add them to .gitignore."
+        echo "  Set ALLOW_DIRTY_PUSH=true in .hooks/config to allow pushing anyway."
+        exit 1
+    fi
+fi
+
+exit 0
