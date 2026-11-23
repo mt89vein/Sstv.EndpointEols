@@ -1,5 +1,7 @@
 # Sstv.EndpointEol
 
+![Pipeline](https://github.com/mt89vein/Sstv.EndpointEols/workflows/publish/badge.svg)
+
 Declarative end-of-life (sunsetting) management for ASP.NET Core endpoints.
 
 Announce retirement dates with standard HTTP headers, measure who still uses legacy endpoints,
@@ -52,10 +54,10 @@ drifts out of sync. `Sstv.EndpointEol` makes the lifecycle declarative and obser
 
 ## Packages
 
-| Package | Purpose |
-|---|---|
-| `Sstv.EndpointEol` | Runtime: attribute, middleware, metrics, diagnostics, startup validation. |
-| `Sstv.EndpointEol.Swashbuckle` | Swashbuckle/OpenAPI annotations. Optional. |
+| Package | Version | Purpose |
+|---|---|---|
+| `Sstv.EndpointEol` | [![NuGet version](https://img.shields.io/nuget/v/Sstv.EndpointEol.svg?style=flat-square)](https://www.nuget.org/packages/Sstv.EndpointEol) | Runtime: attribute, middleware, metrics, diagnostics, startup validation. |
+| `Sstv.EndpointEol.Swashbuckle` | [![NuGet version](https://img.shields.io/nuget/v/Sstv.EndpointEol.Swashbuckle.svg?style=flat-square)](https://www.nuget.org/packages/Sstv.EndpointEol.Swashbuckle) | Swashbuckle/OpenAPI annotations. Optional. |
 
 ```bash
 dotnet add package Sstv.EndpointEol
