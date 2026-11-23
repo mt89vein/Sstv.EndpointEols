@@ -68,7 +68,6 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: ./tests/Sstv.EndpointEol.IntegrationTests/coverage.info ./tests/Sstv.EndpointEol.Tests/coverage.info
 
   deploy:
     permissions:
